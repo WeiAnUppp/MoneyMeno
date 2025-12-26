@@ -38,7 +38,7 @@ struct RecentExpenseRow: View {
         case .home:
             formatter.dateFormat = "M月d日 EEEE"  // 月日 星期
         case .list:
-            formatter.dateFormat = "yyyy年M月d日" // 年月日 
+            formatter.dateFormat = "yyyy年M月d日" // 年月日
         }
         
         return formatter.string(from: transaction.date)
