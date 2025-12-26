@@ -21,7 +21,7 @@ struct SaleView: View {
 
                     RecentExpenseRow(
                         transaction: transaction,
-                        style: .home,
+                        style: .list,
                         icon: category.safeSystemIcon,
                         color: category.uiColor
                     )

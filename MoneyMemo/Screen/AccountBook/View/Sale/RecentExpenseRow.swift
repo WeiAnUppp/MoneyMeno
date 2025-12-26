@@ -10,7 +10,7 @@ import SwiftUI
 
 enum ExpenseRowStyle {
     case home    // 显示日期
-    case list    // 不显示日期
+    case list    // 显示日期 显示年份
 }
 
 struct RecentExpenseRow: View {
@@ -33,7 +33,14 @@ struct RecentExpenseRow: View {
     private var dateText: String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "M月d日 EEEE"
+        
+        switch style {
+        case .home:
+            formatter.dateFormat = "M月d日 EEEE"  // 月日 星期
+        case .list:
+            formatter.dateFormat = "yyyy年M月d日" // 年月日 
+        }
+        
         return formatter.string(from: transaction.date)
     }
     
@@ -57,19 +64,19 @@ struct RecentExpenseRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             
-            if style == .home {
-                HStack {
-                    Text(dateText)
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    Text(timeText)
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                }
+            
+            HStack {
+                Text(dateText)
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                
+                Spacer()
+                
+                Text(timeText)
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
             }
+            
             
             // 主体卡片
             HStack(spacing: 12) {

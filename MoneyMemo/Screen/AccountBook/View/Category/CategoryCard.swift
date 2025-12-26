@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct CategoryCard: View {
-
+    
+    @Environment(\.horizontalSizeClass) var hSizeClass
     @EnvironmentObject var appSettings: AppSettings
 
     let icon: String
