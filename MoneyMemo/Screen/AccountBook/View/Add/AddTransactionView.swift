@@ -73,7 +73,6 @@ struct AddTransactionView: View {
                             Spacer()
 
                             Text(selectedCategory?.name ?? "请选择")
-                                .font(.footnote)
                                 .foregroundColor(.secondary)
                         }
                     }
