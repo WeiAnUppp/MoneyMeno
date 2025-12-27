@@ -126,6 +126,7 @@ struct AddTransactionView: View {
                     }
                 }
             }
+            .scrollDismissesKeyboard(.interactively)
             // 点空白收起键盘
             .onTapGesture {
                 focusedField = nil
