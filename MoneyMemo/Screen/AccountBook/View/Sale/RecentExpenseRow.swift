@@ -9,8 +9,8 @@
 import SwiftUI
 
 enum ExpenseRowStyle {
-    case home    // 显示日期
-    case list    // 显示日期 显示年份
+    case home
+    case list
 }
 
 struct RecentExpenseRow: View {
@@ -36,9 +36,9 @@ struct RecentExpenseRow: View {
         
         switch style {
         case .home:
-            formatter.dateFormat = "M月d日 EEEE"  // 月日 星期
+            formatter.dateFormat = "M月d日 EEEE"
         case .list:
-            formatter.dateFormat = "yyyy年M月d日" // 年月日
+            formatter.dateFormat = "yyyy年M月d日"
         }
         
         return formatter.string(from: transaction.date)
@@ -78,7 +78,6 @@ struct RecentExpenseRow: View {
             }
             
             
-            // 主体卡片
             HStack(spacing: 12) {
                 
                 // 图标

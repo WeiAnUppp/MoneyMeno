@@ -10,6 +10,7 @@ import SwiftUI
 struct AboutView: View {
 
     let updateLogs: [String] = [
+        "2025/12/27 - 新增添加、删除功能",
         "2025/12/26 - 添加账本页面功能",
         "2025/12/25 - 完善交易、分类、添加页面",
         "2025/12/24 - 新增交易、分类页面",

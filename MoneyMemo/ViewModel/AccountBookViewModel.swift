@@ -7,6 +7,9 @@
 
 import Foundation
 import Combine
+import Supabase
+import Foundation
+import PostgREST
 
 @MainActor
 final class AccountBookViewModel: ObservableObject {
@@ -87,4 +90,22 @@ final class AccountBookViewModel: ObservableObject {
             abs(NSDecimalNumber(decimal: $1.amount).doubleValue)
         }
     }
+    
+    @MainActor
+    func deleteTransaction(_ transaction: Transaction) async {
+        do {
+            try await supabase
+                .from("transaction")
+                .delete()
+                .eq("id", value: transaction.id)
+                .execute()
+
+            transactions.removeAll { $0.id == transaction.id }
+
+        } catch {
+            print("删除失败：\(error)")
+        }
+    }
+    
+    
 }

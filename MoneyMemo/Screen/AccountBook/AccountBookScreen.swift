@@ -14,6 +14,8 @@ struct AccountBookScreen: View {
     @StateObject private var viewModel = AccountBookViewModel()
     @State private var showAddSheet = false
     @State private var selectedRange: TimeRange = .month
+    @State private var showDeleteConfirm = false
+    @State private var pendingDelete: Transaction?
     
     
     var body: some View {
@@ -173,6 +175,7 @@ private extension AccountBookScreen{
         .padding(.top, 8)
         .sheet(isPresented: $showAddSheet) {
             AddTransactionView()
+                .environmentObject(viewModel)
         }
     }
     
@@ -230,6 +233,7 @@ private extension AccountBookScreen{
     private func LastSaleView(viewModel: AccountBookViewModel) -> some View {
         VStack(spacing: 12) {
             
+            // 标题
             HStack {
                 Text("近期交易")
                     .font(.title2)
@@ -250,23 +254,60 @@ private extension AccountBookScreen{
             }
             .padding(.horizontal)
             
-            VStack(spacing: 12) {
-                
+            
+            
+            
+            // 交易列表
+            List {
                 ForEach(viewModel.transactions.prefix(10)) { transaction in
-                    let category = viewModel.category(for: transaction.categoryID)
-                    
                     RecentExpenseRow(
                         transaction: transaction,
                         style: .home,
-                        icon: category.safeSystemIcon,
-                        color: category.uiColor
+                        icon: viewModel.category(for: transaction.categoryID).safeSystemIcon,
+                        color: viewModel.category(for: transaction.categoryID).uiColor
                     )
+                    .frame(height: 68)
+                    .padding(.bottom, 8)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button {
+                            pendingDelete = transaction
+                            showDeleteConfirm = true
+                        } label: {
+                            Label("删除", systemImage: "trash")
+                        }
+                        .tint(.red)
+                        
+                        // 编辑按钮
+                        Button {
+                            print("编辑 \(transaction.id)")
+                        } label: {
+                            Label("编辑", systemImage: "pencil")
+                        }
+                        .tint(.blue)
+                    }
                 }
-                
             }
-            .padding(.horizontal)
+            .scrollDisabled(true)
+            .listStyle(.plain)
+            .frame(height: CGFloat(min(viewModel.transactions.count, 10)) * 109)
+        }
+        .alert("确定要删除这笔记录吗？", isPresented: $showDeleteConfirm, presenting: pendingDelete) { tx in
+            Button("删除", role: .destructive) {
+                Task {
+                    await viewModel.deleteTransaction(tx)
+                    pendingDelete = nil
+                }
+            }
+            Button("取消", role: .cancel) {
+                pendingDelete = nil
+            }
+        } message: { _ in
+            Text("删除后无法恢复")
         }
     }
+    
     
     var FootView : some View{
         

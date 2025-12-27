@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct MoneyMemoApp: App {
     @StateObject private var appSettings = AppSettings()
+    @StateObject private var accountBookVM = AccountBookViewModel()
     @State private var isActive = false
 
     var body: some Scene {
@@ -18,6 +19,7 @@ struct MoneyMemoApp: App {
                 if isActive {
                     HomeView()
                         .environmentObject(appSettings)
+                        .environmentObject(accountBookVM)
                 } else {
                     SplashView()
                 }
