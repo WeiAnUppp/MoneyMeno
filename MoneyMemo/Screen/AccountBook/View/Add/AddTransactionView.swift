@@ -77,7 +77,7 @@ struct AddTransactionView: View {
                         }
                     }
                 }
-                // MARK: - 详情
+                // MARK: - 详情...
                 Section("详情") {
 
                     // 项目
