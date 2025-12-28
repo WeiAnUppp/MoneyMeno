@@ -108,4 +108,32 @@ final class AccountBookViewModel: ObservableObject {
     }
     
     
+    func filteredTransactions(filter: SaleFilter) -> [Transaction] {
+
+        transactions.filter { tx in
+
+            // 类型
+            if filter.type != 0 {
+                if filter.type == 1 && tx.type != 0 { return false } // 支出
+                if filter.type == 2 && tx.type != 1 { return false } // 收入
+            }
+
+            // 分类
+            if !filter.categories.isEmpty {
+                if !filter.categories.contains(tx.categoryID) {
+                    return false
+                }
+            }
+
+            // 时间
+            if filter.useDateRange {
+                if tx.date < filter.startDate || tx.date > filter.endDate {
+                    return false
+                }
+            }
+
+            return true
+        }
+    }
+    
 }

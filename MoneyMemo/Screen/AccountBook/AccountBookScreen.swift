@@ -16,6 +16,7 @@ struct AccountBookScreen: View {
     @State private var selectedRange: TimeRange = .month
     @State private var showDeleteConfirm = false
     @State private var pendingDelete: Transaction?
+    @State private var editingTransaction: Transaction?
     
     
     var body: some View {
@@ -45,6 +46,9 @@ struct AccountBookScreen: View {
             }.background(Color(.systemGroupedBackground))
                 .task {
                     await viewModel.loadAll(userID: 1)
+                }.sheet(item: $editingTransaction) { tx in
+                    TransactionView(mode: .edit(tx))
+                        .environmentObject(viewModel)
                 }
         }
         
@@ -174,7 +178,7 @@ private extension AccountBookScreen{
         .padding(.horizontal)
         .padding(.top, 8)
         .sheet(isPresented: $showAddSheet) {
-            AddTransactionView()
+            TransactionView(mode: .add)
                 .environmentObject(viewModel)
         }
     }
@@ -260,12 +264,17 @@ private extension AccountBookScreen{
             // 交易列表
             List {
                 ForEach(viewModel.transactions.prefix(10)) { transaction in
-                    RecentExpenseRow(
-                        transaction: transaction,
-                        style: .home,
-                        icon: viewModel.category(for: transaction.categoryID).safeSystemIcon,
-                        color: viewModel.category(for: transaction.categoryID).uiColor
-                    )
+                    Button {
+                        editingTransaction = transaction
+                    } label: {
+                        RecentExpenseRow(
+                            transaction: transaction,
+                            style: .home,
+                            icon: viewModel.category(for: transaction.categoryID).safeSystemIcon,
+                            color: viewModel.category(for: transaction.categoryID).uiColor
+                        )
+                    }
+                    .buttonStyle(.plain)
                     .frame(height: 68)
                     .padding(.bottom, 8)
                     .listRowSeparator(.hidden)
@@ -281,7 +290,7 @@ private extension AccountBookScreen{
                         
                         // 编辑按钮
                         Button {
-                            print("编辑 \(transaction.id)")
+                            editingTransaction = transaction
                         } label: {
                             Label("编辑", systemImage: "pencil")
                         }

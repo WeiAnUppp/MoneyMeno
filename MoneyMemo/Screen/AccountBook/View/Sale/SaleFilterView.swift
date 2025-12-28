@@ -9,37 +9,39 @@ import SwiftUI
 
 struct SaleFilterView: View {
     
+    let onApply: (SaleFilter) -> Void
+    
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var viewModel: AccountBookViewModel
+    
+    // MARK: - State
+    @State private var selectedType = 0
+    
+    @State private var categoryExpanded = false
+    @State private var selectedCategories: Set<Category> = []
+    
+    @State private var useCustomDateRange = false
+    @State private var showDatePicker = false
+    @State private var editingStartDate = true
     
     @State private var startDate: Date = Calendar.current.date(
         from: DateComponents(year: 2025, month: 12, day: 1)
     ) ?? Date()
     
     @State private var endDate: Date = Date()
-    @State private var selectedCategories: Set<Category> = []
-    @State private var selectedType = 0
-    @State private var selectedPeriod = 0
-    @State private var useCustomDateRange = false
     
-    let categories: [Category] = [
-        Category(name: "餐饮", icon: "fork.knife", color: .orange),
-        Category(name: "出行", icon: "bus", color: .blue),
-        Category(name: "购物", icon: "cart", color: .pink),
-        Category(name: "娱乐", icon: "gamecontroller", color: .purple),
-        Category(name: "生活", icon: "house", color: .green),
-        Category(name: "其他", icon: "ellipsis", color: .gray)
-    ]
-    
-    var dateRangeText: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return "\(formatter.string(from: startDate)) ~ \(formatter.string(from: endDate))"
+    // MARK: - Date Text
+    private var dateRangeText: String {
+        let start = startDate.formatted(date: .numeric, time: .omitted)
+        let end = endDate.formatted(date: .numeric, time: .omitted)
+        return "\(start) ~ \(end)"
     }
     
     var body: some View {
         NavigationStack {
             Form {
                 
+                // MARK: - 类型
                 Section("类型") {
                     Picker("类型", selection: $selectedType) {
                         Text("全部").tag(0)
@@ -49,42 +51,62 @@ struct SaleFilterView: View {
                     .pickerStyle(.segmented)
                 }
                 
-                Section("时间") {
+                // MARK: - 日期
+                Section("日期") {
                     
-                    Toggle("自定义时间范围", isOn: $useCustomDateRange)
+                    Toggle("自定义日期范围", isOn: $useCustomDateRange)
                     
                     if useCustomDateRange {
-                        NavigationLink {
-                            DateRangePickerView(
-                                startDate: $startDate,
-                                endDate: $endDate
-                            )
-                        } label: {
-                            HStack {
-                                Text("时间范围")
-                                Spacer()
-                                Text(dateRangeText)
+                        HStack {
+                            Text("日期范围")
+                            Spacer()
+                            Text(dateRangeText)
+                                .foregroundColor(.secondary)
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            showDatePicker = true
+                        }
+                    }
+                }
+                
+                // MARK: - 分类
+                Section {
+                    DisclosureGroup(isExpanded: $categoryExpanded) {
+                        LazyVGrid(
+                            columns: Array(
+                                repeating: GridItem(.flexible(), spacing: 12),
+                                count: 3
+                            ),
+                            spacing: 12
+                        ) {
+                            ForEach(viewModel.categories) { category in
+                                categoryItem(category)
+                            }
+                        }
+                        .padding(.vertical, 8)
+                    } label: {
+                        HStack {
+                            Text("分类")
+                                .font(.headline)
+                            
+                            Spacer()
+                            
+                            if selectedCategories.isEmpty {
+                                Text("全部")
+                                    .foregroundColor(.secondary)
+                            } else {
+                                Text("已选 \(selectedCategories.count) 个")
                                     .foregroundColor(.secondary)
                             }
                         }
                     }
                 }
-                
-                Section("分类") {
-                    LazyVGrid(
-                        columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3),
-                        spacing: 12
-                    ) {
-                        ForEach(categories) { category in
-                            categoryItem(category)
-                        }
-                    }
-                    .padding(.vertical, 8)
-                }
             }
             .navigationTitle("筛选")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                
                 ToolbarItem(placement: .topBarLeading) {
                     Button("取消") {
                         dismiss()
@@ -93,53 +115,108 @@ struct SaleFilterView: View {
                 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("完成") {
-                        // 以后在这里回传筛选条件
+                        
+                        let filter = SaleFilter(
+                            type: selectedType,
+                            categories: Set(selectedCategories.map { $0.name }),
+                            useDateRange: useCustomDateRange,
+                            startDate: startDate,
+                            endDate: endDate
+                        )
+                        
+                        onApply(filter)
                         dismiss()
                     }
+                    .tint(canSubmit ? .blue : .gray)
+                    .disabled(!canSubmit)
                 }
+            }
+        }
+        // MARK: - 日期滚轮 Sheet（和 Add 页面一致）
+        .sheet(isPresented: $showDatePicker) {
+            VStack(spacing: 16) {
+                
+                Picker("", selection: $editingStartDate) {
+                    Text("开始日期").tag(true)
+                    Text("结束日期").tag(false)
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                
+                DatePicker(
+                    "",
+                    selection: editingStartDate ? $startDate : $endDate,
+                    in: ...Date(),
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.wheel)
+                .labelsHidden()
+                
+                Button {
+                    showDatePicker = false
+                } label: {
+                    Text("完成")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Capsule().fill(Color.accentColor))
+                        .foregroundColor(.white)
+                }
+                .padding(.horizontal)
+            }
+            .padding()
+            .presentationDetents([.height(360)])
+        }
+        // MARK: - 数据加载
+        .task {
+            if viewModel.categories.isEmpty {
+                await viewModel.loadAll(userID: 1)
             }
         }
     }
     
-    struct Category: Identifiable, Hashable {
-        let id = UUID()
-        let name: String
-        let icon: String
-        let color: Color
-    }
-    
-    @ViewBuilder
-    func categoryItem(_ category: Category) -> some View {
+    // MARK: - 分类 Item
+    private func categoryItem(_ category: Category) -> some View {
         let isSelected = selectedCategories.contains(category)
         
-        VStack(spacing: 6) {
-            Image(systemName: category.icon)
+        return VStack(spacing: 6) {
+            Image(systemName: category.safeSystemIcon)
                 .font(.title2)
                 .foregroundColor(.white)
                 .frame(width: 44, height: 44)
                 .background(
-                    Circle()
-                        .fill(category.color)
+                    Circle().fill(category.uiColor)
                 )
             
             Text(category.name)
                 .font(.caption)
-                .foregroundColor(.primary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(isSelected ? category.color.opacity(0.15) : Color.clear)
+                .fill(isSelected
+                      ? category.uiColor.opacity(0.15)
+                      : Color.clear)
         )
+        .contentShape(Rectangle())
         .onTapGesture {
             withAnimation(.easeInOut) {
-                if isSelected {
-                    selectedCategories.remove(category)
-                } else {
-                    selectedCategories.insert(category)
-                }
+                toggleCategory(category)
             }
         }
+    }
+    
+    // MARK: - 逻辑
+    private func toggleCategory(_ category: Category) {
+        if selectedCategories.contains(category) {
+            selectedCategories.remove(category)
+        } else {
+            selectedCategories.insert(category)
+        }
+    }
+    
+    private var canSubmit: Bool {
+        true
     }
 }
