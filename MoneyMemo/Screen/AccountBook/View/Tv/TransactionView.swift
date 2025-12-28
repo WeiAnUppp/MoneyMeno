@@ -152,10 +152,15 @@ struct TransactionView: View {
 
             // 日期选择
             .sheet(isPresented: $showDatePicker) {
-                DatePicker("", selection: $selectedDate, displayedComponents: .date)
-                    .datePickerStyle(.wheel)
-                    .labelsHidden()
-                    .presentationDetents([.height(300)])
+                DatePicker(
+                    "",
+                    selection: $selectedDate,
+                    in: ...Date(),
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.wheel)
+                .labelsHidden()
+                .presentationDetents([.height(300)])
             }
         }
         // MARK: - 初始化
