@@ -26,10 +26,8 @@ struct CategoryCard: View {
 
     // MARK: - 金额格式
     private var formattedAmount: String {
-        let number = NSDecimalNumber(decimal: amount)
-        let sign = amount >= 0 ? "+" : "−"
-        let value = abs(number.doubleValue)
-        return "¥\(String(format: "%.2f", value))"
+//        let sign = amount >= 0 ? "+" : "−"
+        return "\(appSettings.formatCurrency(amount))"
     }
 
     // MARK: - 金额颜色（弱红强绿）

@@ -66,11 +66,6 @@ struct AccountBookScreen: View {
             income - expense
         }
         
-        private func formatCurrency(_ value: Decimal) -> String {
-            let number = NSDecimalNumber(decimal: value.absValue)
-            return "¥" + number.stringValue
-        }
-        
         var body: some View {
             VStack(alignment: .leading, spacing: 12) {
                 
@@ -80,7 +75,7 @@ struct AccountBookScreen: View {
                         .font(.footnote)
                         .foregroundColor(.secondary)
                     
-                    Text(formatCurrency(expense))
+                    Text(appSettings.formatCurrency(expense))
                         .font(.largeTitle)
                         .bold()
                         .foregroundColor(.primary)
@@ -98,7 +93,7 @@ struct AccountBookScreen: View {
                         .font(.footnote)
                         .foregroundColor(.secondary)
                     
-                    Text(formatCurrency(income))
+                    Text(appSettings.formatCurrency(income))
                         .font(.footnote)
                         .foregroundColor(.primary)
                         .contentTransition(.numericText())
@@ -111,7 +106,7 @@ struct AccountBookScreen: View {
                         .font(.footnote)
                         .foregroundColor(.secondary)
                     
-                    Text(formatCurrency(balance))
+                    Text(appSettings.formatCurrency(balance))
                         .font(.footnote)
                         .foregroundColor(balance >= 0 ? .green : .red)
                         .contentTransition(.numericText())
@@ -300,7 +295,7 @@ private extension AccountBookScreen{
             }
             .scrollDisabled(true)
             .listStyle(.plain)
-            .frame(height: CGFloat(min(viewModel.transactions.count, 10)) * 109)
+            .frame(height: CGFloat(min(viewModel.transactions.count, 10)) * 107)
         }
         .alert("确定要删除这笔记录吗？", isPresented: $showDeleteConfirm, presenting: pendingDelete) { tx in
             Button("删除", role: .destructive) {
@@ -324,7 +319,6 @@ private extension AccountBookScreen{
             .font(.footnote)
             .foregroundColor(.secondary)
             .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.vertical, 10)
             .padding(.bottom,20)
         
     }

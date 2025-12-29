@@ -53,8 +53,8 @@ struct RecentExpenseRow: View {
     
     // MARK: - 金额
     private var formattedAmount: String {
-        let number = NSDecimalNumber(decimal: transaction.amount)
-        return "¥" + number.stringValue
+//        let sign = transaction.amount >= 0 ? "+" : "−"
+        return "\(appSettings.formatCurrency(transaction.amount))"
     }
     
     private var amountColor: Color {

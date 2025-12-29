@@ -47,4 +47,34 @@ class SettingsRepository {
             .execute()
             .value
     }
+    
+    func updateCurrencyValue(_ currency: String, userID: Int = 1) async throws -> [Settings] {
+        try await supabase
+            .from("settings")
+            .update(["currency": currency])
+            .eq("userID", value: userID)
+            .select()
+            .execute()
+            .value
+    }
+    
+    func updateDecimalDigits(_ decimalDigits: Int, userID: Int = 1) async throws -> [Settings] {
+        try await supabase
+            .from("settings")
+            .update(["decimalDigits": decimalDigits])
+            .eq("userID", value: userID)
+            .select()
+            .execute()
+            .value
+    }
+    
+    func updateDarkMode(_ darkMode: Bool, userID: Int = 1) async throws -> [Settings] {
+        try await supabase
+            .from("settings")
+            .update(["darkMode": darkMode ? 1 : 0])
+            .eq("userID", value: userID)
+            .select()
+            .execute()
+            .value
+    }
 }

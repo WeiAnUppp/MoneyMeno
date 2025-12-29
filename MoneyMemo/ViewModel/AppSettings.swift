@@ -10,4 +10,19 @@ import Combine
 
 class AppSettings: ObservableObject {
     @Published var darkMode: Bool = false
+    @Published var currency: String = "CNY"
+    @Published var decimalDigits: Int = 2
+    @Published var currencySymbol: String = "¥"
+    
+    
+    func formatCurrency(_ value: Decimal) -> String {
+            let number = NSDecimalNumber(decimal: value.absValue)
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.maximumFractionDigits = decimalDigits
+            formatter.minimumFractionDigits = decimalDigits
+            
+            let valueString = formatter.string(from: number) ?? "\(number)"
+            return "\(currencySymbol)\(valueString)"
+        }
 }

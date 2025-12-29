@@ -25,19 +25,24 @@ struct MoneyMemoApp: App {
                 }
             }
             .task {
+                // 延迟显示启动页
                 Task {
                     try? await Task.sleep(nanoseconds: 2_000_000_000)
                     isActive = true
                 }
 
+                // 启动时加载设置
                 Task {
                     do {
-                        let settings = try await SettingsRepository.shared.loadSettings()
+                        let loadedSettings = try await SettingsRepository.shared.loadSettings()
                         DispatchQueue.main.async {
-                            appSettings.darkMode = settings.darkMode == 1
+                            appSettings.darkMode = loadedSettings.darkMode == 1
+                            appSettings.currency = loadedSettings.currency
+                            appSettings.currencySymbol = currencySymbol(loadedSettings.currency)
+                            appSettings.decimalDigits = loadedSettings.decimalDigits
                         }
                     } catch {
-                        print(error)
+                        print("加载设置失败:", error)
                     }
                 }
             }

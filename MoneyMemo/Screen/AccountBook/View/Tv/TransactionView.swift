@@ -18,6 +18,7 @@ struct TransactionView: View {
     let mode: TransactionMode
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var viewModel: AccountBookViewModel
+    @EnvironmentObject var appSettings: AppSettings
 
     // MARK: - Focus
     @FocusState private var focusedField: Field?
@@ -39,6 +40,10 @@ struct TransactionView: View {
 
     // 自动保存快照
     @State private var lastSavedSnapshot: EditSnapshot?
+    
+    // 在 TransactionView 中添加一个页面状态
+    @State private var selectedCurrency: String = "CNY"
+
 
     var body: some View {
         NavigationStack {
@@ -86,15 +91,30 @@ struct TransactionView: View {
                             .multilineTextAlignment(.trailing)
                             .focused($focusedField, equals: .title)
                     }
+                    
+                    row("单位") {
+                        Menu {
+                            Button("CNY") { selectedCurrency = "CNY" }
+                            Button("HKD") { selectedCurrency = "HKD" }
+                            Button("USD") { selectedCurrency = "USD" }
+                        } label: {
+                            HStack {
+                                Text(selectedCurrency) // 只显示页面状态，不修改 appSettings
+                                    .foregroundColor(.primary)
+                                Image(systemName: "chevron.down")
+                                    .foregroundColor(.primary)
+                            }
+                        }
+                    }
 
                     row("金额") {
-                        TextField("0.00", text: $amountText)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .focused($focusedField, equals: .amount)
-                            .onChange(of: amountText) {
-                                amountText = sanitizeAmount($0)
-                            }
+                        HStack(spacing: 4) {
+                            TextField("0.00", text: $amountText)
+                                .keyboardType(.decimalPad)
+                                .multilineTextAlignment(.trailing)
+                                .focused($focusedField, equals: .amount)
+                                .onChange(of: amountText) { amountText = sanitizeAmount($0) }
+                        }
                     }
 
                     row("日期") {
@@ -166,7 +186,7 @@ struct TransactionView: View {
         // MARK: - 初始化
         .task {
             await viewModel.loadAll(userID: 1)
-
+            selectedCurrency = appSettings.currency
             if case let .edit(tx) = mode {
                 titleText = tx.name
                 amountText = NSDecimalNumber(decimal: tx.amount).stringValue
@@ -318,4 +338,5 @@ struct TransactionView: View {
 #Preview {
     TransactionView(mode: .add)
         .environmentObject(AccountBookViewModel())
+        .environmentObject(AppSettings())
 }
