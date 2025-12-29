@@ -151,6 +151,16 @@ struct SaleFilterView: View {
                 )
                 .datePickerStyle(.wheel)
                 .labelsHidden()
+                .onChange(of: startDate) { newValue in
+                    if newValue > endDate {
+                        endDate = newValue
+                    }
+                }
+                .onChange(of: endDate) { newValue in
+                    if newValue < startDate {
+                        startDate = newValue
+                    }
+                }
                 
                 Button {
                     showDatePicker = false
