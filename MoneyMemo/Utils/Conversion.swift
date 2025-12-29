@@ -25,15 +25,15 @@ func sanitizeAmount(_ input: String) -> String {
     
     // 没有小数点
     if parts.count == 1 {
-        let integerPart = parts[0].isEmpty ? "0" : parts[0].prefix(9)
-        return String(integerPart)
+        let integerPart = parts[0].drop { $0 == "0" } // 去掉前导 0
+        return integerPart.isEmpty ? "0" : String(integerPart.prefix(9))
     }
     
     // 多个小数点，只保留第一个
-    let integerPart = parts[0].isEmpty ? "0" : parts[0] // 如果前面为空，补0
+    let integerPart = parts[0].drop { $0 == "0" } // 去掉前导 0
     let decimalPart = parts[1].prefix(2) // 小数部分最多两位
     
-    return "\(integerPart).\(decimalPart)"
+    return "\(integerPart.isEmpty ? "0" : integerPart).\(decimalPart)"
 }
 
 func currencySymbol(_ newCurrency: String) -> String {
