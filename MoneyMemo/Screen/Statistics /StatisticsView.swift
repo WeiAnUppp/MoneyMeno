@@ -10,6 +10,32 @@ import Charts
 
 struct StatisticsView: View {
     
+    enum CategoryType: String, CaseIterable, Identifiable {
+        case expense = "支出"
+        case income = "收入"
+        
+        var id: String { rawValue }
+    }
+    
+    @State private var selectedCategoryType: CategoryType = .expense
+    
+    let incomeCategoryDemo: [ExpenseCategory] = [
+        .init(name: "工资", amount: 4200),
+        .init(name: "兼职", amount: 800),
+        .init(name: "理财", amount: 300),
+        .init(name: "其他", amount: 200)
+    ]
+    
+    var currentCategoryData: [ExpenseCategory] {
+        selectedCategoryType == .expense
+        ? expenseCategoryDemo
+        : incomeCategoryDemo
+    }
+    
+    var sortedCurrentCategories: [ExpenseCategory] {
+        currentCategoryData.sorted { $0.amount > $1.amount }
+    }
+    
     @EnvironmentObject var appSettings: AppSettings
     
     let demoChartData: [IncomeExpenseData] = [
@@ -128,89 +154,11 @@ struct StatisticsView: View {
                     }
                     .padding(.horizontal)
                     // 支出构成
-                    VStack(alignment: .leading, spacing: 12) {
-                        VStack(alignment: .leading, spacing: 16) {
-                            
-                            Text("支出构成")
-                                .font(.title2)
-                                .bold()
-                                .padding(.leading, 16)
-                            
-                            HStack {
-                                Spacer()
-                                
-                                HStack(alignment: .center, spacing: 30) {
-                                    
-                                    // 饼图
-                                    Chart(expenseCategoryDemo) { item in
-                                        SectorMark(
-                                            angle: .value("金额", item.amount),
-                                            innerRadius: .ratio(0.6)
-                                        )
-                                        .foregroundStyle(by: .value("分类", item.name))
-                                    }
-                                    .frame(width: 180, height: 180)
-                                    .chartLegend(.hidden)
-                                    
-                                    // 右侧图例（小圆点 + 分类名）
-                                    VStack(alignment: .leading, spacing: 14) {
-                                        ForEach(expenseCategoryDemo) { item in
-                                            HStack(spacing: 10) {
-                                                Circle()
-                                                    .fill(colorForCategory(item.name))
-                                                    .frame(width: 10, height: 10)
-                                                
-                                                Text(item.name)
-                                                    .font(.subheadline)
-                                                    .foregroundColor(.primary.opacity(0.8))
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                Spacer()
-                            }
-                            .padding(.horizontal)
-                            VStack(alignment: .leading, spacing: 12) {
-                                
-                                Text("支出排行")
-                                    .font(.headline)
-                                    .bold()
-                                
-                                ForEach(sortedExpenseCategories.indices, id: \.self) { index in
-                                    let item = sortedExpenseCategories[index]
-                                    
-                                    HStack {
-                                        Text("\(index + 1)")
-                                            .font(.footnote)
-                                            .foregroundColor(.secondary)
-                                            .frame(width: 20)
-                                        
-                                        Text(item.name)
-                                            .font(.footnote)
-                                        
-                                        Spacer()
-                                        
-                                        Text("¥\(Int(item.amount))")
-                                            .font(.footnote)
-                                    }
-                                    
-                                    if index != sortedExpenseCategories.count - 1 {
-                                        Divider()
-                                    }
-                                }
-                            }
-                            .padding(12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(Color(.secondarySystemGroupedBackground))
-                            )
-                            .padding(.horizontal)
-                        }
-                        .padding(.vertical)
-                        
-                        
-                    }
+                    CategoryCompositionView(
+                        selectedCategoryType: $selectedCategoryType,
+                        currentCategoryData: currentCategoryData,
+                        sortedCurrentCategories: sortedCurrentCategories
+                    )
                     .padding(.horizontal)
                 }
                 .padding(.vertical)
@@ -400,9 +348,137 @@ extension StatisticsView.StatRange {
             return .month
         }
     }
+    
+    
 }
 
+// MARK: - 支出 / 收入构成视图
+struct CategoryCompositionView: View {
+    
+    @Binding var selectedCategoryType: StatisticsView.CategoryType
+    let currentCategoryData: [StatisticsView.ExpenseCategory]
+    let sortedCurrentCategories: [StatisticsView.ExpenseCategory]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            header
+            pieSection
+            rankingSection
+                .padding(.horizontal)
+        }
+        .padding(.vertical)
+        .animation(.easeInOut(duration: 0.25), value: selectedCategoryType)
+    }
+}
 
+private extension CategoryCompositionView {
+    
+    var header: some View {
+        HStack {
+            Text(selectedCategoryType == .expense ? "支出构成" : "收入构成")
+                .font(.title2)
+                .bold()
+            
+            Spacer()
+            
+            Picker("", selection: $selectedCategoryType) {
+                ForEach(StatisticsView.CategoryType.allCases) { type in
+                    Text(type.rawValue).tag(type)
+                }
+            }
+            .pickerStyle(.segmented)
+            .frame(width: 140)
+        }
+        .padding(.horizontal, 16)
+    }
+}
+private extension CategoryCompositionView {
+    
+    var pieSection: some View {
+        HStack {
+            Spacer()
+            
+            HStack(spacing: 30) {
+                
+                Chart(currentCategoryData) { item in
+                    SectorMark(
+                        angle: .value("金额", item.amount),
+                        innerRadius: .ratio(0.6)
+                    )
+                    .foregroundStyle(by: .value("分类", item.name))
+                }
+                .frame(width: 180, height: 180)
+                .chartLegend(.hidden)
+                
+                VStack(alignment: .leading, spacing: 14) {
+                    ForEach(currentCategoryData) { item in
+                        HStack(spacing: 10) {
+                            Circle()
+                                .fill(colorForCategory(item.name))
+                                .frame(width: 10, height: 10)
+                            
+                            Text(item.name)
+                                .font(.subheadline)
+                        }
+                    }
+                }
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal)
+    }
+}
+private extension CategoryCompositionView {
+    
+    var rankingSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+
+            Text(selectedCategoryType == .expense ? "支出排行" : "收入排行")
+                .font(.headline)
+                .bold()
+
+            ForEach(sortedCurrentCategories.indices, id: \.self) { index in
+                let item = sortedCurrentCategories[index]
+
+                HStack {
+                    Text("\(index + 1)")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .frame(width: 20)
+
+                    Text(item.name)
+                        .font(.footnote)
+
+                    Spacer()
+
+                    Text("¥\(Int(item.amount))")
+                        .font(.footnote)
+                }
+
+                if index != sortedCurrentCategories.count - 1 {
+                    Divider()
+                }
+            }
+        }
+        .padding(12) // 👈 只留这一层
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Color(.secondarySystemGroupedBackground))
+        )
+    }
+    
+}
+
+func colorForCategory(_ name: String) -> Color {
+    switch name {
+    case "餐饮": return .orange
+    case "交通": return .blue
+    case "娱乐": return .pink
+    case "购物": return .green
+    default: return .gray
+    }
+}
 #Preview {
     StatisticsView()
         .environmentObject(AppSettings())
