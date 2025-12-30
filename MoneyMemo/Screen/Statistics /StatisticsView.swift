@@ -176,7 +176,7 @@ struct StatisticsView: View {
     private var timeHeader: some View {
         HStack {
             
-            // ⬅️ 左箭头
+            // 左箭头
             Button {
                 shiftDate(by: -1)
             } label: {
