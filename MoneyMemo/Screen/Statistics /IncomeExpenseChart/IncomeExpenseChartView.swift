@@ -46,12 +46,12 @@ struct IncomeExpenseChartView: View {
                 )
         )
         .onAppear {
-            withAnimation(.easeOut(duration: 0.8)) {
+            withAnimation(.easeOut(duration: 0.5)) {
                 animatedData = chartData
             }
         }
         .onChange(of: chartData) { newData in
-            withAnimation(.easeOut(duration: 0.8)) {
+            withAnimation(.easeOut(duration: 0.5)) {
                 animatedData = newData
             }
         }
