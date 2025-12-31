@@ -13,6 +13,7 @@ struct SummaryCardView: View {
     let selectedRange: TimeRange
     let expense: Decimal
     let income: Decimal
+    var showRangeText: Bool = true
     
     @EnvironmentObject var appSettings: AppSettings
     
@@ -25,7 +26,7 @@ struct SummaryCardView: View {
             
             // 支出
             VStack(alignment: .leading, spacing: 4) {
-                Text("\(selectedRange.rawValue)支出")
+                Text("\(showRangeText ? selectedRange.rawValue : "")支出")
                     .font(.footnote)
                     .foregroundColor(.secondary)
                 
@@ -43,7 +44,7 @@ struct SummaryCardView: View {
             
             // 收入
             HStack(spacing: 8) {
-                Text("\(selectedRange.rawValue)收入")
+                Text("\(showRangeText ? selectedRange.rawValue : "")收入")
                     .font(.footnote)
                     .foregroundColor(.secondary)
                 
@@ -56,7 +57,7 @@ struct SummaryCardView: View {
             
             // 结余
             HStack(spacing: 8) {
-                Text("\(selectedRange.rawValue)结余")
+                Text("\(showRangeText ? selectedRange.rawValue : "")结余")
                     .font(.footnote)
                     .foregroundColor(.secondary)
                 

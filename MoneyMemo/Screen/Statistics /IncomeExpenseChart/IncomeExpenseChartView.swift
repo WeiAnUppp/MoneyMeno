@@ -12,6 +12,7 @@ struct IncomeExpenseChartView: View {
     let chartData: [IncomeExpenseData]
     @State private var animatedData: [IncomeExpenseData] = []
     
+    
     var body: some View {
         VStack {
             Chart {
