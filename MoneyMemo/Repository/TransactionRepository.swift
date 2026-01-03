@@ -51,4 +51,13 @@ final class TransactionRepository {
             .eq("id", value: id)
             .execute()
     }
+    
+    // MARK: - 清空全部交易
+    func deleteAllTransactions() async throws {
+        try await supabase
+            .from("transaction")
+            .delete()
+            .neq("id", value: 0)
+            .execute()
+    }
 }

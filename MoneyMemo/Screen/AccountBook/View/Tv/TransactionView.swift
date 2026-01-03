@@ -6,53 +6,55 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct TransactionView: View {
-
+    
     enum TransactionMode {
         case add
         case edit(Transaction)
     }
     
-
+    
     let mode: TransactionMode
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var viewModel: AccountBookViewModel
     @EnvironmentObject var appSettings: AppSettings
-
+    
     // MARK: - Focus
     @FocusState private var focusedField: Field?
     enum Field { case title, amount, note }
-
+    
     // MARK: - State
     @State private var categoryExpanded = false
     @State private var showDatePicker = false
-
+    
     @State private var selectedType = 1
     @State private var titleText = ""
     @State private var amountText = ""
     @State private var noteText = ""
     @State private var selectedDate = Date()
     @State private var selectedCategory: Category?
+    @State private var isRecognizing = false
     
     @State private var showDeleteConfirm = false
     @State private var pendingDelete: Transaction?
-
+    
+    @State private var showImagePicker = false
+    @State private var pickedImage: UIImage?
+    
     // 自动保存快照
     @State private var lastSavedSnapshot: EditSnapshot?
     
     // 在 TransactionView 中添加一个页面状态
     @State private var selectedCurrency: String = "CNY"
-
-
+    
+    
     var body: some View {
+        
         NavigationStack {
             Form {
-
-//                Text(modeTitle)
-//                    .font(.title)
-//                    .fontWeight(.semibold)
-
+                
                 // MARK: - 分类
                 Section {
                     DisclosureGroup(isExpanded: $categoryExpanded) {
@@ -82,10 +84,10 @@ struct TransactionView: View {
                         }
                     }
                 }
-
+                
                 // MARK: - 详情
                 Section("详情") {
-
+                    
                     row("项目") {
                         TextField("如：午餐、地铁", text: $titleText)
                             .multilineTextAlignment(.trailing)
@@ -106,7 +108,7 @@ struct TransactionView: View {
                             }
                         }
                     }
-
+                    
                     row("金额") {
                         HStack(spacing: 4) {
                             TextField("0.00", text: $amountText)
@@ -116,7 +118,7 @@ struct TransactionView: View {
                                 .onChange(of: amountText) { amountText = sanitizeAmount($0) }
                         }
                     }
-
+                    
                     row("日期") {
                         Text(selectedDate.formatted(.dateTime.year().month().day()))
                             .foregroundColor(.secondary)
@@ -126,7 +128,7 @@ struct TransactionView: View {
                         focusedField = nil
                         showDatePicker = true
                     }
-
+                    
                     row("备注") {
                         TextField("选填", text: $noteText)
                             .multilineTextAlignment(.trailing)
@@ -135,14 +137,14 @@ struct TransactionView: View {
                 }
             }
             .onTapGesture { focusedField = nil }
-
+            
             // MARK: - Toolbar
             .toolbar {
-
+                
                 ToolbarItem(placement: .topBarLeading) {
                     Button("取消") { dismiss() }
                 }
-
+                
                 ToolbarItem(placement: .principal) {
                     Picker("", selection: $selectedType) {
                         Text("支出").tag(1)
@@ -151,13 +153,13 @@ struct TransactionView: View {
                     .pickerStyle(.segmented)
                     .frame(width: 130)
                 }
-
+                
                 ToolbarItem(placement: .topBarTrailing) {
                     switch mode {
                     case .add:
                         Button("完成") { submitAdd() }
                             .disabled(!canSubmit)
-
+                        
                     case .edit(let tx):
                         Button(role: .destructive) {
                             pendingDelete = tx
@@ -169,7 +171,7 @@ struct TransactionView: View {
                     }
                 }
             }
-
+            
             // 日期选择
             .sheet(isPresented: $showDatePicker) {
                 DatePicker(
@@ -194,7 +196,7 @@ struct TransactionView: View {
                 selectedDate = tx.date
                 selectedType = tx.type == 0 ? 1 : 2
                 selectedCategory = viewModel.categories.first { $0.name == tx.categoryID }
-
+                
                 lastSavedSnapshot = makeSnapshot()
             }
         }
@@ -215,25 +217,81 @@ struct TransactionView: View {
             }
         } message: { _ in
             Text("删除后无法恢复")
+            
+        }
+        .safeAreaInset(edge: .bottom) {
+            if case .add = mode {
+                HStack {
+                    Spacer()
+                    Button {
+                        onCameraTap()
+                    } label: {
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 22))
+                            .foregroundColor(.white)
+                            .frame(width: 56, height: 56)
+                            .background(Color.accentColor)
+                            .clipShape(Circle())
+                            .shadow(radius: 4)
+                    }
+                    .padding(.trailing, 20)
+                }
+                .padding(.bottom, 12)
+            }
+        }.sheet(isPresented: $showImagePicker) {
+            ImagePicker(image: $pickedImage)
+                .onDisappear {
+                    if let image = pickedImage {
+                        print("已选择图片，size = \(image.size)")
+                        isRecognizing = true
+
+                        recognizeTransaction(image: image) { result in
+                            DispatchQueue.main.async {
+                                isRecognizing = false
+
+                                print("AI 回调触发")
+                                guard let result else {
+                                    print("AI 返回 nil")
+                                    return
+                                }
+                                applyAIResult(result)
+                            }
+                        }
+                    } else {
+                        print("没有拿到图片")
+                    }
+                }
+        }.overlay {
+            if isRecognizing {
+                AIRecognizingOverlay()
+            }
         }
     }
-
+    
+    
+    
+ 
+    private func onCameraTap() {
+        showImagePicker = true
+        print("点击了相册按钮")
+    }
+    
     // MARK: - 自动保存
     private func autoSaveIfNeeded() {
         guard case let .edit(tx) = mode else { return }
         guard canSubmit else { return }
-
+        
         let snapshot = makeSnapshot()
         if snapshot == lastSavedSnapshot { return }
-
+        
         lastSavedSnapshot = snapshot
         saveEdit(tx)
     }
-
+    
     private func saveEdit(_ tx: Transaction) {
         guard let amount = Double(amountText),
               let category = selectedCategory else { return }
-
+        
         let update = TransactionUpdate(
             id: tx.id,
             name: titleText.isEmpty ? category.name : titleText,
@@ -243,19 +301,19 @@ struct TransactionView: View {
             date: selectedDate,
             remark: noteText.isEmpty ? nil : noteText
         )
-
+        
         Task {
             try? await TransactionRepository.shared.updateTransaction(update)
             await viewModel.loadAll(userID: 1)
         }
     }
-
+    
     // MARK: - 新增
     private func submitAdd() {
         guard let category = selectedCategory,
               let amount = Double(amountText),
               amount > 0 else { return }
-
+        
         let create = TransactionCreate(
             userID: 1,
             name: titleText.isEmpty ? category.name : titleText,
@@ -265,14 +323,14 @@ struct TransactionView: View {
             date: selectedDate,
             remark: noteText.isEmpty ? nil : noteText
         )
-
+        
         Task {
             try? await TransactionRepository.shared.createTransaction(create)
             await viewModel.loadAll(userID: 1)
             dismiss()
         }
     }
-
+    
     // MARK: - 删除
     private func delete(_ tx: Transaction) {
         Task {
@@ -281,7 +339,7 @@ struct TransactionView: View {
             dismiss()
         }
     }
-
+    
     // MARK: - 工具
     private func row(_ title: String, @ViewBuilder content: () -> some View) -> some View {
         HStack {
@@ -290,11 +348,11 @@ struct TransactionView: View {
             content()
         }
     }
-
+    
     private var canSubmit: Bool {
         selectedCategory != nil && Double(amountText) ?? 0 > 0
     }
-
+    
     private var modeTitle: String {
         switch mode {
         case .add:
@@ -313,7 +371,7 @@ struct TransactionView: View {
             remark: noteText
         )
     }
-
+    
     private var snapshotKey: String {
         [
             titleText,
@@ -324,7 +382,7 @@ struct TransactionView: View {
             "\(selectedDate.timeIntervalSince1970)"
         ].joined()
     }
-
+    
     struct EditSnapshot: Equatable {
         let name: String
         let category: String
@@ -333,7 +391,41 @@ struct TransactionView: View {
         let date: Date
         let remark: String
     }
+    
+    func applyAIResult(_ result: AIResult) {
+        print("应用 AI 结果：\(result)")
+        DispatchQueue.main.async {
+
+            if let amount = result.amount {
+                amountText = String(format: "%.2f", amount)
+            }
+
+            if let date = result.date {
+                selectedDate = date
+            }
+
+            if let categoryName = result.category {
+                selectedCategory = viewModel.categories.first {
+                    $0.name == categoryName  
+                }
+            }
+
+            if let title = result.title, titleText.isEmpty {
+                titleText = title
+            }
+
+            if let remark = result.remark, noteText.isEmpty {
+                noteText = remark
+            }
+
+            if let type = result.type {
+                selectedType = type
+            }
+        }
+    }
 }
+
+
 
 #Preview {
     TransactionView(mode: .add)

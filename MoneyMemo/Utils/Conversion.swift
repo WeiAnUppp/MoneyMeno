@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 func intToBool(_ num: Int) -> Bool {
     return num == 1
@@ -43,4 +44,9 @@ func currencySymbol(_ newCurrency: String) -> String {
     case "HKD": return "HK$"
     default: return newCurrency
     }
+}
+
+func imageToBase64(_ image: UIImage) -> String? {
+    guard let data = image.jpegData(compressionQuality: 0.8) else { return nil }
+    return data.base64EncodedString()
 }

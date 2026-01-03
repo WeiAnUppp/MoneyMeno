@@ -11,11 +11,12 @@ import PostgREST
 
 struct SettingsView: View {
     
+    @EnvironmentObject var accountBookViewModel: AccountBookViewModel
     @EnvironmentObject var appSettings: AppSettings
     
-    @State private var showResetAlert = false
+    @State private var showResetConfirm = false
     @State private var showAboutSheet = false
-
+    
     var body: some View {
         NavigationStack {
             Form {
@@ -25,26 +26,32 @@ struct SettingsView: View {
             }
             .navigationTitle("设置")
             .navigationBarTitleDisplayMode(.large)
-            .alert("确定要重置信息吗？", isPresented: $showResetAlert) {
-                Button("取消", role: .cancel) { }
-                Button("重置", role: .destructive) {
-                    withAnimation(.easeInOut(duration: 0.4)) {
-                        // 执行重置操作
-                    }
-                }
-            }
             .sheet(isPresented: $showAboutSheet) {
                 AboutView()
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
             }
         }
-        .preferredColorScheme(appSettings.darkMode ? .dark : .light)
-        .animation(.easeInOut(duration: 0.4), value: appSettings.darkMode)
-    }
+        .alert("确定要重置信息吗？", isPresented: $showResetConfirm) {
+            
+            Button("取消", role: .cancel) { }
+            
+            Button("重置", role: .destructive) {
+                Task {
+                    do {
+                        try await TransactionRepository.shared.deleteAllTransactions()
+                        await accountBookViewModel.loadAll(userID: 1)
+                    } catch {
+                        print("清空交易失败:", error)
+                    }
+                }
+            }
+        }}
 }
 
 private extension SettingsView {
+    
+    // MARK: - 外观
     var aspectView: some View {
         Section("外观") {
             Toggle(isOn: Binding(
@@ -67,6 +74,7 @@ private extension SettingsView {
         }
     }
     
+    // MARK: - 显示
     var displayView: some View {
         Section("显示") {
             Picker(
@@ -77,15 +85,10 @@ private extension SettingsView {
                 Text("HKD").tag("HKD")
                 Text("USD").tag("USD")
             }
-            .pickerStyle(.automatic)
             .onChange(of: appSettings.currency) { newValue in
                 appSettings.currencySymbol = currencySymbol(newValue)
                 Task {
-                    do {
-                        try await SettingsRepository.shared.updateCurrencyValue(newValue)
-                    } catch {
-                        print("更新失败:", error)
-                    }
+                    try? await SettingsRepository.shared.updateCurrencyValue(newValue)
                 }
             }
             
@@ -97,28 +100,32 @@ private extension SettingsView {
                 Text("1 位").tag(1)
                 Text("2 位").tag(2)
             }
-            .pickerStyle(.automatic)
             .onChange(of: appSettings.decimalDigits) { newValue in
                 Task {
-                    do {
-                        try await SettingsRepository.shared.updateDecimalDigits(newValue)
-                    } catch {
-                        print("更新失败:", error)
-                    }
+                    try? await SettingsRepository.shared.updateDecimalDigits(newValue)
                 }
             }
         }
     }
     
+    // MARK: - 其他
     var otherView: some View {
         Section("其他") {
-            Button(role: .destructive) {
-                showResetAlert = true
+            
+            Button {
+                showResetConfirm = true
             } label: {
-                Label("重置信息", systemImage: "trash")
+                Label {
+                    Text("重置信息")
+                        .foregroundStyle(.red)
+                } icon: {
+                    Image(systemName: "trash")
+                }
             }
             
-            Button(role: .none) {
+            
+            // 关于
+            Button {
                 showAboutSheet = true
             } label: {
                 Label {
@@ -135,4 +142,5 @@ private extension SettingsView {
 #Preview {
     SettingsView()
         .environmentObject(AppSettings())
+        .environmentObject(AccountBookViewModel())
 }
