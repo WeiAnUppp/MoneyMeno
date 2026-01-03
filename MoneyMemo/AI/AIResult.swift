@@ -18,20 +18,46 @@ struct AIResult {
 }
 
 func parseAIResult(_ text: String) -> AIResult? {
-    guard let data = text.data(using: .utf8),
-          let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
-    else { return nil }
+    guard
+        let data = text.data(using: .utf8),
+        let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+    else {
+        return nil
+    }
 
     let amount = json["amount"] as? Double
+    let type = json["type"] as? Int
 
+    // 解析时间（支持多格式）
     let date: Date? = {
         guard let str = json["date"] as? String else { return nil }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.date(from: str)
-    }()
 
-    let type = json["type"] as? Int   
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+
+        let formats = [
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd HH:mm",
+            "yyyy-MM-dd"
+        ]
+
+        for format in formats {
+            formatter.dateFormat = format
+            if let d = formatter.date(from: str) {
+                // 如果只有日期，补中午 12:00:00
+                if format == "yyyy-MM-dd" {
+                    return Calendar.current.date(
+                        bySettingHour: 12,
+                        minute: 0,
+                        second: 0,
+                        of: d
+                    )
+                }
+                return d
+            }
+        }
+        return nil
+    }()
 
     return AIResult(
         amount: amount,
@@ -42,3 +68,4 @@ func parseAIResult(_ text: String) -> AIResult? {
         type: type
     )
 }
+

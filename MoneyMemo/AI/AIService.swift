@@ -42,7 +42,7 @@ func recognizeTransaction(
 请从图片中识别消费信息，只返回 JSON：
 {
   "amount": number,
-  "date": "YYYY-MM-DD",
+  "date": "YYYY-MM-DD HH:mm:ss",
   "title": string,
   "category": string,
   "remark": string
