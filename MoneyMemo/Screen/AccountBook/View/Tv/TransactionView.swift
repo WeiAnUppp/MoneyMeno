@@ -49,6 +49,8 @@ struct TransactionView: View {
     // 在 TransactionView 中添加一个页面状态
     @State private var selectedCurrency: String = "CNY"
     
+    @State private var keyboardHeight: CGFloat = 0
+    
     
     var body: some View {
         
@@ -219,26 +221,25 @@ struct TransactionView: View {
             Text("删除后无法恢复")
             
         }
-        .safeAreaInset(edge: .bottom) {
-            if case .add = mode {
-                HStack {
-                    Spacer()
-                    Button {
-                        onCameraTap()
-                    } label: {
-                        Image(systemName: "camera.fill")
-                            .font(.system(size: 22))
-                            .foregroundColor(.white)
-                            .frame(width: 56, height: 56)
-                            .background(Color.accentColor)
-                            .clipShape(Circle())
-                            .shadow(radius: 4)
-                    }
-                    .padding(.trailing, 20)
+        .overlay(alignment: .bottomTrailing) {
+            if case .add = mode, keyboardHeight == 0 {
+                Button {
+                    onCameraTap()
+                } label: {
+                    Image(systemName: "camera.fill")
+                        .font(.system(size: 22))
+                        .foregroundColor(.white)
+                        .frame(width: 56, height: 56)
+                        .background(Color.accentColor)
+                        .clipShape(Circle())
+                        .shadow(radius: 4)
                 }
-                .padding(.bottom, 12)
+                .padding(.trailing, 20)
+                .padding(.bottom, 20)
+                .transition(.scale)
             }
-        }.sheet(isPresented: $showImagePicker) {
+        }
+        .animation(.easeInOut, value: keyboardHeight).sheet(isPresented: $showImagePicker) {
             ImagePicker(image: $pickedImage)
                 .onDisappear {
                     if let image = pickedImage {
@@ -265,6 +266,28 @@ struct TransactionView: View {
             if isRecognizing {
                 AIRecognizingOverlay()
             }
+        }
+        .onAppear {
+            NotificationCenter.default.addObserver(
+                forName: UIResponder.keyboardWillShowNotification,
+                object: nil,
+                queue: .main
+            ) { notification in
+                if let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                    keyboardHeight = frame.height
+                }
+            }
+
+            NotificationCenter.default.addObserver(
+                forName: UIResponder.keyboardWillHideNotification,
+                object: nil,
+                queue: .main
+            ) { _ in
+                keyboardHeight = 0
+            }
+        }
+        .onDisappear {
+            NotificationCenter.default.removeObserver(self)
         }
     }
     
