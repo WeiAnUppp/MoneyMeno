@@ -127,7 +127,7 @@ struct SaleFilterView: View {
                         onApply(filter)
                         dismiss()
                     }
-                    .tint(canSubmit ? .blue : .gray)
+                    .tint(canSubmit ? .primary : .gray)
                     .disabled(!canSubmit)
                 }
             }
@@ -169,8 +169,9 @@ struct SaleFilterView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(Capsule().fill(Color.accentColor))
-                        .foregroundColor(.white)
+                        .background(
+                            Capsule().fill(Color.primary)
+                        )
                 }
                 .padding(.horizontal)
             }
