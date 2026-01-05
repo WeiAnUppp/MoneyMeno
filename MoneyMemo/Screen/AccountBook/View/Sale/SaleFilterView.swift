@@ -169,9 +169,8 @@ struct SaleFilterView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(
-                            Capsule().fill(Color.primary)
-                        )
+                        .background(Capsule().fill(Color.accentColor))
+                        .foregroundColor(.white)
                 }
                 .padding(.horizontal)
             }
