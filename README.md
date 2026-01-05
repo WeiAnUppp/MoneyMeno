@@ -51,5 +51,5 @@
 
 - **前端**：SwiftUI  
 - **后端**：Supabase + PostgREST  
-- **数据存储**：Supabase Database  
+- **数据存储**：PostgreSQL
 - **智能识别**：GLM 图像识别（OCR）
