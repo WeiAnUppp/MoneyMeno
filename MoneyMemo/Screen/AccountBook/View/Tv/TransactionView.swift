@@ -226,7 +226,7 @@ struct TransactionView: View {
                 Button {
                     onCameraTap()
                 } label: {
-                    Image(systemName: "camera.fill")
+                    Image(systemName: "photo")
                         .font(.system(size: 22))
                         .foregroundColor(.white)
                         .frame(width: 56, height: 56)
