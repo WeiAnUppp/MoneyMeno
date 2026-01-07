@@ -7,7 +7,7 @@
 
 import Foundation
 
-// MARK: - 设置
+// MARK: - 应用设置实体
 struct Settings: Identifiable, Codable {
     var id: Int
     var darkMode: Int

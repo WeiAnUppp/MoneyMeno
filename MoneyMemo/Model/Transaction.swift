@@ -7,7 +7,7 @@
 
 import Foundation
 
-// MARK: - 操作记录
+// MARK: - 交易记录实体
 struct Transaction: Identifiable, Codable {
     
     var id: Int

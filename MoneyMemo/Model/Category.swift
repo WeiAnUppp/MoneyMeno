@@ -8,7 +8,7 @@
 
 import Foundation
 
-// MARK: - 分类
+// MARK: - 分类类型实体
 struct Category: Identifiable, Codable, Hashable {
     var id: Int
     var name: String

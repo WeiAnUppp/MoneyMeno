@@ -7,7 +7,7 @@
 
 import Foundation
 
-// MARK: - 分类金额总计
+// MARK: - 分类金额总计模型
 struct CategorySummary: Identifiable {
     let id: Int
     let category: Category

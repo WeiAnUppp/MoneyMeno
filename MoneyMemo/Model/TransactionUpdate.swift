@@ -7,7 +7,7 @@
 
 import Foundation
 
-// MARK: - 修改操作记录
+// MARK: - 修改交易数据模型
 struct TransactionUpdate: Codable {
     let id: Int
     let name: String
