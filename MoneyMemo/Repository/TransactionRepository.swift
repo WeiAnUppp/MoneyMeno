@@ -10,10 +10,10 @@ import Supabase
 import PostgREST
 
 final class TransactionRepository {
-
+    
     static let shared = TransactionRepository()
     private init() {}
-
+    
     // MARK: - 新增
     func createTransaction(_ transaction: TransactionCreate) async throws {
         try await supabase
@@ -21,14 +21,14 @@ final class TransactionRepository {
             .insert(transaction)
             .execute()
     }
-
+    
     // MARK: - 更新
     func updateTransaction(_ transaction: TransactionUpdate) async throws {
-
+        
         let dateString = transaction.date.formatted(
             .dateTime.year().month().day()
         )
-
+        
         try await supabase
             .from("transaction")
             .update([
@@ -37,12 +37,12 @@ final class TransactionRepository {
                 "amount": String(transaction.amount),
                 "type": String(transaction.type),
                 "date": dateString,
-                "remark": transaction.remark   
+                "remark": transaction.remark
             ])
             .eq("id", value: transaction.id)
             .execute()
     }
-
+    
     // MARK: - 删除
     func deleteTransaction(id: Int) async throws {
         try await supabase

@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension Category {
-
+    
     var uiColor: Color {
         switch color.lowercased() {
         case "red": return .red

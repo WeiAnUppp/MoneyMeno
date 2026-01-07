@@ -13,7 +13,7 @@ struct Settings: Identifiable, Codable {
     var currency: String
     var decimalDigits: Int
     var userID: Int
-
+    
     init(
         id: Int = 0,
         darkMode: Int = 0,
@@ -27,11 +27,11 @@ struct Settings: Identifiable, Codable {
         self.decimalDigits = decimalDigits
         self.userID = userID
     }
-
+    
     var isDarkMode: Bool {
         return darkMode == 1
     }
-
+    
     var decimalFormat: String {
         switch decimalDigits {
         case 0: return "%.0f"

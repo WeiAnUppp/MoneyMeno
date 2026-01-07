@@ -135,9 +135,11 @@ private extension CategoryCompositionView {
                 .fill(Color(.secondarySystemGroupedBackground))
         )
         .transaction { transaction in
-            transaction.animation = nil   // ⭐ 关键
+            transaction.animation = nil
         }
     }
+    
+    
     func colorForCategory(_ name: String) -> Color {
         switch name {
         case "交通": return .blue

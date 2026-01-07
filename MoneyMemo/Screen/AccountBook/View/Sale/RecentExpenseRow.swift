@@ -53,7 +53,7 @@ struct RecentExpenseRow: View {
     
     // MARK: - 金额
     private var formattedAmount: String {
-//        let sign = transaction.amount >= 0 ? "+" : "−"
+        //        let sign = transaction.amount >= 0 ? "+" : "−"
         return "\(appSettings.formatCurrency(transaction.amount))"
     }
     

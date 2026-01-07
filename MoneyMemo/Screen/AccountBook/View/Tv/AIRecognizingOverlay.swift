@@ -9,12 +9,12 @@ import SwiftUI
 
 struct AIRecognizingOverlay: View {
     @State private var isAnimating = false
-
+    
     var body: some View {
         ZStack {
             Color.black.opacity(0.25)
                 .ignoresSafeArea()
-
+            
             VStack(spacing: 16) {
                 Circle()
                     .trim(from: 0.2, to: 1.0)
@@ -25,7 +25,7 @@ struct AIRecognizingOverlay: View {
                         .linear(duration: 1).repeatForever(autoreverses: false),
                         value: isAnimating
                     )
-
+                
                 Text("正在识别账单…")
                     .font(.footnote)
                     .foregroundColor(.secondary)

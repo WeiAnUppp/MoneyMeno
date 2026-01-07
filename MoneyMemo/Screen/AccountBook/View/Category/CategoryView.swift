@@ -8,23 +8,23 @@
 import SwiftUI
 
 struct CategoryView: View {
-
+    
     @ObservedObject var viewModel: AccountBookViewModel
     @Binding var selectedRange: TimeRange
-
+    
     let columns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12)
     ]
-
+    
     var summaries: [CategorySummary] {
         viewModel.categorySummaries(for: selectedRange)
     }
-
+    
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 12) {
-
+                
                 ForEach(summaries) { item in
                     CategoryCard(
                         icon: item.category.safeSystemIcon,

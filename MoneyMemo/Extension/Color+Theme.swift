@@ -10,7 +10,7 @@
 import SwiftUI
 
 extension Color {
-
+    
     static func cardBackground(darkMode: Bool) -> Color {
         darkMode
         ? Color(.secondarySystemGroupedBackground)

@@ -16,13 +16,13 @@ class AppSettings: ObservableObject {
     
     
     func formatCurrency(_ value: Decimal) -> String {
-            let number = NSDecimalNumber(decimal: value.absValue)
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            formatter.maximumFractionDigits = decimalDigits
-            formatter.minimumFractionDigits = decimalDigits
-            
-            let valueString = formatter.string(from: number) ?? "\(number)"
-            return "\(currencySymbol)\(valueString)"
-        }
+        let number = NSDecimalNumber(decimal: value.absValue)
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = decimalDigits
+        formatter.minimumFractionDigits = decimalDigits
+        
+        let valueString = formatter.string(from: number) ?? "\(number)"
+        return "\(currencySymbol)\(valueString)"
+    }
 }

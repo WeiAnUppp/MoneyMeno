@@ -95,66 +95,47 @@ struct StatisticsView: View {
                     showRangePicker: $showRangePicker
                 )
             }
-            .onChange(of: selectedRange) { _ in updateDateRange() }
-            .onChange(of: selectedDate) { _ in updateDateRange() }
-            .onChange(of: startDate) { _ in updateDateRange() }
-            .onChange(of: endDate) { _ in updateDateRange() }
-            .onChange(of: selectedCategoryType) { _ in updateStatisticsOnly() }
+            // MARK: - 监听 UI 状态变化 → 刷新
+            .onChange(of: selectedRange) { _ in refresh() }
+            .onChange(of: selectedDate) { _ in refresh() }
+            .onChange(of: startDate) { _ in refresh() }
+            .onChange(of: endDate) { _ in refresh() }
             
+            // 只切换 收入 / 支出（不重新拉数据）
+            .onChange(of: selectedCategoryType) { _ in
+                let (start, end) = viewModel.dateRange(
+                    range: selectedRange,
+                    reference: selectedDate,
+                    startDate: startDate,
+                    endDate: endDate
+                )
+                viewModel.switchCategoryType(
+                    selectedCategoryType,
+                    start: start,
+                    end: end
+                )
+            }
+            
+            // MARK: - 首次进入
             .onAppear {
-                updateDateRange()
+                refresh()
             }
         }
     }
     
-    // MARK: - 拉交易 + 全量统计
-    func updateDateRange() {
-        let (start, end) = dateRange(for: selectedRange, reference: selectedDate)
+    func refresh() {
         Task {
-            await viewModel.fetchAllCategories()
-            await viewModel.fetchTransactions(for: start, endDate: end)
-            viewModel.updateStatistics(
-                type: selectedCategoryType,
-                startDate: start,
-                endDate: end
+            await viewModel.refresh(
+                range: selectedRange,
+                referenceDate: selectedDate,
+                startDate: startDate,
+                endDate: endDate,
+                categoryType: selectedCategoryType
             )
         }
     }
     
-    // MARK: - 只切换 收入 / 支出
-    func updateStatisticsOnly() {
-        let (start, end) = dateRange(for: selectedRange, reference: selectedDate)
-        viewModel.updateStatistics(
-            type: selectedCategoryType,
-            startDate: start,
-            endDate: end
-        )
-    }
     
-    // MARK: - 时间范围
-    func dateRange(for range: StatRange, reference: Date) -> (Date, Date) {
-        let calendar = Calendar.current
-        switch range {
-        case .week:
-            let start = calendar.dateInterval(of: .weekOfYear, for: reference)?.start ?? reference
-            let end = calendar.date(byAdding: .day, value: 6, to: start) ?? reference
-            return (start, end)
-        case .month:
-            let start = calendar.dateInterval(of: .month, for: reference)?.start ?? reference
-            let end = calendar.date(byAdding: .month, value: 1, to: start)?
-                .addingTimeInterval(-1) ?? reference
-            return (start, end)
-        case .year:
-            let start = calendar.dateInterval(of: .year, for: reference)?.start ?? reference
-            let end = calendar.date(byAdding: .year, value: 1, to: start)?
-                .addingTimeInterval(-1) ?? reference
-            return (start, end)
-        case .all:
-            return (Date.distantPast, Date.distantFuture)
-        case .range:
-            return (startDate, endDate)
-        }
-    }
 }
 
 

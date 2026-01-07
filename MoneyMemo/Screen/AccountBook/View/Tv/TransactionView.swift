@@ -245,11 +245,11 @@ struct TransactionView: View {
                     if let image = pickedImage {
                         print("已选择图片，size = \(image.size)")
                         isRecognizing = true
-
+                        
                         recognizeTransaction(image: image) { result in
                             DispatchQueue.main.async {
                                 isRecognizing = false
-
+                                
                                 print("AI 回调触发")
                                 guard let result else {
                                     print("AI 返回 nil")
@@ -277,7 +277,7 @@ struct TransactionView: View {
                     keyboardHeight = frame.height
                 }
             }
-
+            
             NotificationCenter.default.addObserver(
                 forName: UIResponder.keyboardWillHideNotification,
                 object: nil,
@@ -293,7 +293,7 @@ struct TransactionView: View {
     
     
     
- 
+    
     private func onCameraTap() {
         showImagePicker = true
         print("点击了相册按钮")
@@ -333,23 +333,15 @@ struct TransactionView: View {
     
     // MARK: - 新增
     private func submitAdd() {
-        guard let category = selectedCategory,
-              let amount = Double(amountText),
-              amount > 0 else { return }
-        
-        let create = TransactionCreate(
-            userID: 1,
-            name: titleText.isEmpty ? category.name : titleText,
-            categoryID: category.name,
-            amount: amount,
-            type: selectedType == 1 ? 0 : 1,
-            date: selectedDate,
-            remark: noteText.isEmpty ? nil : noteText
-        )
-        
         Task {
-            try? await TransactionRepository.shared.createTransaction(create)
-            await viewModel.loadAll(userID: 1)
+            try? await viewModel.addTransaction(
+                title: titleText,
+                amountText: amountText,
+                category: selectedCategory,
+                type: selectedType,
+                date: selectedDate,
+                remark: noteText.isEmpty ? nil : noteText
+            )
             dismiss()
         }
     }
@@ -357,8 +349,7 @@ struct TransactionView: View {
     // MARK: - 删除
     private func delete(_ tx: Transaction) {
         Task {
-            try? await TransactionRepository.shared.deleteTransaction(id: tx.id)
-            await viewModel.loadAll(userID: 1)
+            try? await viewModel.deleteTransaction(tx)
             dismiss()
         }
     }
@@ -384,6 +375,7 @@ struct TransactionView: View {
             return "记录详情"
         }
     }
+    
     private func makeSnapshot() -> EditSnapshot {
         EditSnapshot(
             name: titleText,
@@ -418,29 +410,29 @@ struct TransactionView: View {
     func applyAIResult(_ result: AIResult) {
         print("应用 AI 结果：\(result)")
         DispatchQueue.main.async {
-
+            
             if let amount = result.amount {
                 amountText = String(format: "%.2f", amount)
             }
-
+            
             if let date = result.date {
                 selectedDate = date
             }
-
+            
             if let categoryName = result.category {
                 selectedCategory = viewModel.categories.first {
-                    $0.name == categoryName  
+                    $0.name == categoryName
                 }
             }
-
+            
             if let title = result.title, titleText.isEmpty {
                 titleText = title
             }
-
+            
             if let remark = result.remark, noteText.isEmpty {
                 noteText = remark
             }
-
+            
             if let type = result.type {
                 selectedType = type
             }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AboutView: View {
-
+    
     let updateLogs: [String] = [
         "2026/01/04 - 新增重置信息功能",
         "2026/01/03 - 新增GLM图片识别功能",
@@ -43,7 +43,7 @@ struct AboutView: View {
                     .padding()
                 }
                 
-               
+                
                 Image("GouFu")
                     .resizable()
                     .scaledToFit()

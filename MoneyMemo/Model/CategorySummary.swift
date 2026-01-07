@@ -10,5 +10,5 @@ import Foundation
 struct CategorySummary: Identifiable {
     let id: Int
     let category: Category
-    let amount: Decimal  
+    let amount: Decimal
 }

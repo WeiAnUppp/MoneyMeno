@@ -24,23 +24,23 @@ func parseAIResult(_ text: String) -> AIResult? {
     else {
         return nil
     }
-
+    
     let amount = json["amount"] as? Double
     let type = json["type"] as? Int
-
+    
     // 解析时间（支持多格式）
     let date: Date? = {
         guard let str = json["date"] as? String else { return nil }
-
+        
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
-
+        
         let formats = [
             "yyyy-MM-dd HH:mm:ss",
             "yyyy-MM-dd HH:mm",
             "yyyy-MM-dd"
         ]
-
+        
         for format in formats {
             formatter.dateFormat = format
             if let d = formatter.date(from: str) {
@@ -58,7 +58,7 @@ func parseAIResult(_ text: String) -> AIResult? {
         }
         return nil
     }()
-
+    
     return AIResult(
         amount: amount,
         date: date,

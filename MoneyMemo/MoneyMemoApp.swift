@@ -12,7 +12,7 @@ struct MoneyMemoApp: App {
     @StateObject private var appSettings = AppSettings()
     @StateObject private var accountBookVM = AccountBookViewModel()
     @State private var isActive = false
-
+    
     var body: some Scene {
         WindowGroup {
             ZStack {
@@ -30,7 +30,7 @@ struct MoneyMemoApp: App {
                     try? await Task.sleep(nanoseconds: 2_000_000_000)
                     isActive = true
                 }
-
+                
                 // 启动时加载设置
                 Task {
                     do {

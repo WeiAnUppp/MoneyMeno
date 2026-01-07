@@ -14,7 +14,7 @@ struct Category: Identifiable, Codable, Hashable {
     var systemIcon: String
     var backgroundColor: String
     var color: String
-
+    
     init(
         id: Int = 0,
         name: String = "",
@@ -28,12 +28,12 @@ struct Category: Identifiable, Codable, Hashable {
         self.backgroundColor = backgroundColor
         self.color = color
     }
-
+    
     // 基于 id
     static func == (lhs: Category, rhs: Category) -> Bool {
         lhs.id == rhs.id
     }
-
+    
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }

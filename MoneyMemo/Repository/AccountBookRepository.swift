@@ -26,10 +26,10 @@ final class AccountBookRepository {
     }
     
     func fetchCategories() async throws -> [Category] {
-            try await supabase
-                .from("category")
-                .select()
-                .execute()
-                .value
-        }
+        try await supabase
+            .from("category")
+            .select()
+            .execute()
+            .value
+    }
 }

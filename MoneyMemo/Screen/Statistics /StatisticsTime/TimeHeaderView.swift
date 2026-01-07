@@ -128,7 +128,7 @@ struct TimeHeaderView: View {
         let endOfWeek = calendar.date(byAdding: .day, value: 6, to: startOfWeek) ?? date
         return "\(formatter.string(from: startOfWeek)) ～ \(formatter.string(from: endOfWeek))"
     }
-
+    
     private func monthString(for date: Date) -> String {
         let calendar = Calendar.current
         let formatter = DateFormatter()
@@ -137,7 +137,7 @@ struct TimeHeaderView: View {
         let endOfMonth = calendar.date(byAdding: .month, value: 1, to: startOfMonth)?.addingTimeInterval(-1) ?? date
         return "\(formatter.string(from: startOfMonth)) ～ \(formatter.string(from: endOfMonth))"
     }
-
+    
     private func yearString(for date: Date) -> String {
         let calendar = Calendar.current
         let formatter = DateFormatter()

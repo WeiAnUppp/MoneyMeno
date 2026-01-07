@@ -12,5 +12,5 @@ struct User: Identifiable, Codable {
     var userID: Int
     var currency: String
     var date: Date
-
+    
 }

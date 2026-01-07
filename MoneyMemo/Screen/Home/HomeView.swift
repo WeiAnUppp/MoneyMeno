@@ -15,10 +15,10 @@ struct HomeView: View {
         TabView {
             AccountBookScreen()
                 .tabItem { Label("账本", systemImage: "book.pages") }
-
+            
             StatisticsView()
                 .tabItem { Label("统计", systemImage: "chart.bar.fill") }
-
+            
             SettingsView()
                 .tabItem { Label("设置", systemImage: "gear") }
         }

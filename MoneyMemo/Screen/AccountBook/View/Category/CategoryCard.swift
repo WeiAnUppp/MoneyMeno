@@ -11,37 +11,37 @@ struct CategoryCard: View {
     
     @Environment(\.horizontalSizeClass) var hSizeClass
     @EnvironmentObject var appSettings: AppSettings
-
+    
     let icon: String
     let title: String
     let amount: Decimal
     let color: Color
-
+    
     // MARK: - 背景色
     private var cardBackground: Color {
         appSettings.darkMode
         ? Color(.secondarySystemGroupedBackground)
         : Color(.systemBackground)
     }
-
+    
     // MARK: - 金额格式
     private var formattedAmount: String {
-//        let sign = amount >= 0 ? "+" : "−"
+        //        let sign = amount >= 0 ? "+" : "−"
         return "\(appSettings.formatCurrency(amount))"
     }
-
+    
     // MARK: - 金额颜色（弱红强绿）
     private var amountColor: Color {
         amount >= 0 ? .green : .primary
     }
-
+    
     var body: some View {
         ZStack {
-
+            
             // 卡片背景
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(cardBackground)
-
+            
             // 左上角分类图标
             Image(systemName: icon)
                 .font(.title3)
@@ -50,23 +50,23 @@ struct CategoryCard: View {
                 .background(color)
                 .clipShape(Circle())
                 .position(x: 30, y: 30)
-
+            
             // 底部信息区
             VStack {
                 Spacer()
-
+                
                 Divider()
                     .padding(.horizontal)
-
+                
                 HStack {
-
+                    
                     // 分类名称
                     Text(title)
                         .font(.footnote)
                         .foregroundColor(.secondary)
-
+                    
                     Spacer()
-
+                    
                     // 金额
                     Text(formattedAmount)
                         .font(.headline)
