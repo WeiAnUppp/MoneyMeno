@@ -7,6 +7,7 @@
 
 import Foundation
 
+// MARK: - 用户
 struct User: Identifiable, Codable {
     var id: Int { userID }
     var userID: Int
