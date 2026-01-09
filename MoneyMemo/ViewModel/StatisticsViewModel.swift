@@ -112,6 +112,7 @@ class StatisticsViewModel: ObservableObject {
         return result.sorted { $0.amount > $1.amount }
     }
     
+    // MARK: - 更新统计数据
     func updateStatistics(
         type: CategoryType,
         startDate: Date,
@@ -158,7 +159,7 @@ class StatisticsViewModel: ObservableObject {
         return result
     }
     
-    // MARK: - 拉交易 + 全量统计 + 只切换 收入 / 支出
+    // MARK: - 拉交易 + 全量统计
     func refresh(
         range: StatRange,
         referenceDate: Date,
@@ -183,6 +184,7 @@ class StatisticsViewModel: ObservableObject {
         )
     }
     
+    // MARK: - 切换 收入 / 支出
     func switchCategoryType(
         _ type: CategoryType,
         start: Date,

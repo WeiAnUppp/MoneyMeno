@@ -17,6 +17,7 @@ func boolToInt(_ value: Bool) -> Int {
 }
 
 
+// MARK: - 检查数字是否合法
 func sanitizeAmount(_ input: String) -> String {
     // 只保留数字和小数点
     let filtered = input.filter { "0123456789.".contains($0) }

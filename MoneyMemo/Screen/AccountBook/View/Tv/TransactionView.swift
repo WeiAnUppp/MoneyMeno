@@ -311,6 +311,7 @@ struct TransactionView: View {
         saveEdit(tx)
     }
     
+    // MARK: - 保存修改内容
     private func saveEdit(_ tx: Transaction) {
         guard let amount = Double(amountText),
               let category = selectedCategory else { return }

@@ -19,7 +19,7 @@ final class AccountBookViewModel: ObservableObject {
     
     private let repository = AccountBookRepository()
     
-    // MARK: - 拉数据
+    // MARK: - 获取全部交易数据
     func loadAll(userID: Int) async {
         do {
             async let t = repository.fetchTransactions(userID: userID)
@@ -32,12 +32,13 @@ final class AccountBookViewModel: ObservableObject {
         }
     }
     
+    // MARK: - 根据分类名查找对应的分类对象
     func category(for categoryName: String) -> Category {
         categories.first { $0.name == categoryName }
         ?? Category(id: 0, name: "未分类", systemIcon: "questionmark.circle", color: "gray")
     }
     
-    // MARK: - 统计（给 SummaryCard 用）
+    // MARK: - 计算收入、支出、结余（给 SummaryCard 用）
     func summary(for range: TimeRange) -> (expense: Decimal, income: Decimal){
         
         let dateRange = range.dateRange()
@@ -91,7 +92,7 @@ final class AccountBookViewModel: ObservableObject {
         }
     }
     
-    // MARK: - 删除
+    // MARK: - 删除交易数据
     func deleteTransaction(_ transaction: Transaction) async {
         do {
             try await TransactionRepository.shared
@@ -104,7 +105,7 @@ final class AccountBookViewModel: ObservableObject {
         }
     }
     
-    // MARK: - 筛选
+    // MARK: - 筛选交易数据
     func filteredTransactions(filter: SaleFilter) -> [Transaction] {
         
         transactions.filter { tx in
@@ -134,7 +135,7 @@ final class AccountBookViewModel: ObservableObject {
     }
     
     
-    // MARK: - 新增数据
+    // MARK: - 新增交易数据
     func addTransaction(
         title: String,
         amountText: String,
@@ -161,7 +162,7 @@ final class AccountBookViewModel: ObservableObject {
         await loadAll(userID: 1)
     }
     
-    // MARK: - 更新数据
+    // MARK: - 更新交易数据
     func updateTransaction(
         origin: Transaction,
         snapshot: TransactionUpdate

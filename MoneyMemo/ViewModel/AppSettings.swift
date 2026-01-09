@@ -14,7 +14,7 @@ class AppSettings: ObservableObject {
     @Published var decimalDigits: Int = 2
     @Published var currencySymbol: String = "¥"
     
-    
+    // MARK: - 显示小数点位数
     func formatCurrency(_ value: Decimal) -> String {
         let number = NSDecimalNumber(decimal: value.absValue)
         let formatter = NumberFormatter()

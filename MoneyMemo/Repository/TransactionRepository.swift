@@ -12,6 +12,7 @@ import PostgREST
 final class TransactionRepository {
     
     static let shared = TransactionRepository()
+    
     private init() {}
     
     // MARK: - 新增

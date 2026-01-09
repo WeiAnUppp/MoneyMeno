@@ -15,11 +15,15 @@ struct SaleFilterView: View {
     @EnvironmentObject var viewModel: AccountBookViewModel
     
     // MARK: - State
+    // 类型筛选（全部 / 支出 / 收入）
     @State private var selectedType = 0
     
     @State private var categoryExpanded = false
+    
+    // 分类筛选
     @State private var selectedCategories: Set<Category> = []
     
+    // 日期范围筛选
     @State private var useCustomDateRange = false
     @State private var showDatePicker = false
     @State private var editingStartDate = true
