@@ -47,6 +47,7 @@ func currencySymbol(_ newCurrency: String) -> String {
     }
 }
 
+// MARK: - 获取的图片转为base64编码格式
 func imageToBase64(_ image: UIImage) -> String? {
     guard let data = image.jpegData(compressionQuality: 0.8) else { return nil }
     return data.base64EncodedString()
