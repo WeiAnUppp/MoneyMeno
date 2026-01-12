@@ -48,7 +48,6 @@ struct TransactionView: View {
     // 自动保存快照
     @State private var lastSavedSnapshot: EditSnapshot?
     
-    // 在 TransactionView 中添加一个页面状态
     @State private var selectedCurrency: String = "CNY"
     
     @State private var keyboardHeight: CGFloat = 0
@@ -105,7 +104,7 @@ struct TransactionView: View {
                             Button("USD") { selectedCurrency = "USD" }
                         } label: {
                             HStack {
-                                Text(selectedCurrency) // 只显示页面状态，不修改 appSettings
+                                Text(selectedCurrency)
                                     .foregroundColor(.primary)
                                 Image(systemName: "chevron.down")
                                     .foregroundColor(.primary)
