@@ -12,11 +12,10 @@ import PostgREST
 
 final class AccountBookRepository {
     
-    private let client = supabase
     
     // MARK: - 获取当前用户的所有交易数据
     func fetchTransactions(userID: Int) async throws -> [Transaction] {
-        try await client
+        try await supabase
             .from("transaction")
             .select()
             .eq("userID", value: userID)
