@@ -21,11 +21,11 @@ struct TransactionView: View {
     @EnvironmentObject var viewModel: AccountBookViewModel
     @EnvironmentObject var appSettings: AppSettings
     
-    // MARK: - Focus
+    // MARK: - 焦点管理（弹出键盘）
     @FocusState private var focusedField: Field?
     enum Field { case title, amount, note }
     
-    // MARK: - State
+    // MARK: - 展示日期选择器
     @State private var categoryExpanded = false
     @State private var showDatePicker = false
     
@@ -37,9 +37,11 @@ struct TransactionView: View {
     @State private var selectedCategory: Category?
     @State private var isRecognizing = false
     
+    // MARK: - 删除弹窗
     @State private var showDeleteConfirm = false
     @State private var pendingDelete: Transaction?
     
+    // MARK: - 展示图片选择
     @State private var showImagePicker = false
     @State private var pickedImage: UIImage?
     
@@ -103,7 +105,7 @@ struct TransactionView: View {
                             Button("USD") { selectedCurrency = "USD" }
                         } label: {
                             HStack {
-                                Text(selectedCurrency) // 只显示页面状态，不修改 appSettings
+                                Text(selectedCurrency)
                                     .foregroundColor(.primary)
                                 Image(systemName: "chevron.down")
                                     .foregroundColor(.primary)

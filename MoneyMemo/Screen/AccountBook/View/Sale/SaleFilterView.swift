@@ -34,7 +34,7 @@ struct SaleFilterView: View {
     
     @State private var endDate: Date = Date()
     
-    // MARK: - Date Text
+    // MARK: - 日期文本
     private var dateRangeText: String {
         let start = startDate.formatted(date: .numeric, time: .omitted)
         let end = endDate.formatted(date: .numeric, time: .omitted)

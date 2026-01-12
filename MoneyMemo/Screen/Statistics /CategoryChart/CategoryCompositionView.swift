@@ -74,7 +74,7 @@ private extension CategoryCompositionView {
                         innerRadius: .ratio(0.6)
                     )
                     .foregroundStyle(
-                        colorForCategory(item.name).gradient
+                       item.color.gradient
                     )
                 }
                 .frame(width: 180, height: 180)
@@ -87,7 +87,7 @@ private extension CategoryCompositionView {
                     ForEach(currentCategoryData) { item in
                         HStack(spacing: 10) {
                             Circle()
-                                .fill(colorForCategory(item.name))
+                                .fill(item.color)
                                 .frame(width: 10, height: 10)
                             Text(item.name)
                                 .font(.subheadline)
@@ -140,17 +140,4 @@ private extension CategoryCompositionView {
     }
     
     
-    func colorForCategory(_ name: String) -> Color {
-        switch name {
-        case "交通": return .blue
-        case "餐饮": return .orange
-        case "购物": return .pink
-        case "生活": return .green
-        case "娱乐": return .purple
-        case "教育": return .yellow
-        case "健康": return .red
-        case "旅行": return .blue
-        default: return .gray
-        }
-    }
 }
