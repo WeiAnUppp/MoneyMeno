@@ -15,6 +15,7 @@ class SettingsRepository {
     
     private init() {}
     
+    // MARK: - 获取设置页数据
     func loadSettings(userID: Int = 1) async throws -> Settings {
         try await supabase
             .from("settings")
@@ -25,29 +26,8 @@ class SettingsRepository {
             .value
     }
     
-    func updateDarkModeAndDecimalDigits(settings: Settings) async throws -> [Settings] {
-        try await supabase
-            .from("settings")
-            .update([
-                "darkMode": settings.darkMode,
-                "decimalDigits": settings.decimalDigits
-            ])
-            .eq("userID", value: settings.userID)
-            .select()
-            .execute()
-            .value
-    }
     
-    func updateCurrency(settings: Settings) async throws -> [Settings] {
-        try await supabase
-            .from("settings")
-            .update(["currency": settings.currency])
-            .eq("userID", value: settings.userID)
-            .select()
-            .execute()
-            .value
-    }
-    
+    // MARK: - 更新货币单位
     func updateCurrencyValue(_ currency: String, userID: Int = 1) async throws -> [Settings] {
         try await supabase
             .from("settings")
@@ -58,6 +38,7 @@ class SettingsRepository {
             .value
     }
     
+    // MARK: - 更新小数点
     func updateDecimalDigits(_ decimalDigits: Int, userID: Int = 1) async throws -> [Settings] {
         try await supabase
             .from("settings")
@@ -68,6 +49,7 @@ class SettingsRepository {
             .value
     }
     
+    // MARK: - 更新深色模式
     func updateDarkMode(_ darkMode: Bool, userID: Int = 1) async throws -> [Settings] {
         try await supabase
             .from("settings")

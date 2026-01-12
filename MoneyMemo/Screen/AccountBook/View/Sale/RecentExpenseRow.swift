@@ -22,13 +22,6 @@ struct RecentExpenseRow: View {
     let icon: String
     let color: Color
     
-    // MARK: - 背景
-    private var cardBackground: Color {
-        appSettings.darkMode
-        ? Color(.secondarySystemGroupedBackground)
-        : Color(.systemBackground)
-    }
-    
     // MARK: - 日期文本
     private var dateText: String {
         let formatter = DateFormatter()
@@ -105,7 +98,7 @@ struct RecentExpenseRow: View {
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 50, style: .continuous)
-                    .fill(cardBackground)
+                    .fill(Color.cardBackground(darkMode: appSettings.darkMode))
             )
             .shadow(color: .black.opacity(0.04),
                     radius: 6, x: 0, y: 2)

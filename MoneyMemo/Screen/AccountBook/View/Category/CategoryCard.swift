@@ -17,13 +17,6 @@ struct CategoryCard: View {
     let amount: Decimal
     let color: Color
     
-    // MARK: - 背景色
-    private var cardBackground: Color {
-        appSettings.darkMode
-        ? Color(.secondarySystemGroupedBackground)
-        : Color(.systemBackground)
-    }
-    
     // MARK: - 金额格式
     private var formattedAmount: String {
         //        let sign = amount >= 0 ? "+" : "−"
@@ -40,7 +33,7 @@ struct CategoryCard: View {
             
             // 卡片背景
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(cardBackground)
+                .fill(Color.cardBackground(darkMode: appSettings.darkMode))
             
             // 左上角分类图标
             Image(systemName: icon)

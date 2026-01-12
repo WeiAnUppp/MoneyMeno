@@ -86,7 +86,7 @@ class StatisticsViewModel: ObservableObject {
             $0.date <= endDate
         }
         
-        // 按「分类名」统计金额（🔑 关键修正）
+        // 按「分类名」统计金额
         var summaryDict: [String: Decimal] = [:]
         
         for tx in filteredTx {

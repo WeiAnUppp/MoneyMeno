@@ -14,7 +14,7 @@ final class AccountBookRepository {
     
     private let client = supabase
     
-    /// 获取当前用户的所有交易数据
+    // MARK: - 获取当前用户的所有交易数据
     func fetchTransactions(userID: Int) async throws -> [Transaction] {
         try await client
             .from("transaction")
@@ -25,7 +25,7 @@ final class AccountBookRepository {
             .value
     }
     
-    /// 获取所有分类
+    // MARK: - 获取所有分类
     func fetchCategories() async throws -> [Category] {
         try await supabase
             .from("category")
