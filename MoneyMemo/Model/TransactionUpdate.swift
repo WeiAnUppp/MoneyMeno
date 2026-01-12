@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - 修改交易数据模型
-struct TransactionUpdate: Codable {
+struct TransactionUpdate: Encodable {
     let id: Int
     let name: String
     let categoryID: String

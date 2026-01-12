@@ -25,21 +25,9 @@ final class TransactionRepository {
     
     // MARK: - 更新
     func updateTransaction(_ transaction: TransactionUpdate) async throws {
-        
-        let dateString = transaction.date.formatted(
-            .dateTime.year().month().day()
-        )
-        
         try await supabase
             .from("transaction")
-            .update([
-                "name": transaction.name,
-                "categoryID": transaction.categoryID,
-                "amount": String(transaction.amount),
-                "type": String(transaction.type),
-                "date": dateString,
-                "remark": transaction.remark
-            ])
+            .update(transaction)
             .eq("id", value: transaction.id)
             .execute()
     }

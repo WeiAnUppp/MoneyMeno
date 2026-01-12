@@ -21,7 +21,7 @@ struct TransactionView: View {
     @EnvironmentObject var viewModel: AccountBookViewModel
     @EnvironmentObject var appSettings: AppSettings
     
-    // MARK: - 焦点管理（弹出键盘）
+    // MARK: - 焦点管理
     @FocusState private var focusedField: Field?
     enum Field { case title, amount, note }
     
@@ -105,7 +105,7 @@ struct TransactionView: View {
                             Button("USD") { selectedCurrency = "USD" }
                         } label: {
                             HStack {
-                                Text(selectedCurrency)
+                                Text(selectedCurrency) // 只显示页面状态，不修改 appSettings
                                     .foregroundColor(.primary)
                                 Image(systemName: "chevron.down")
                                     .foregroundColor(.primary)
