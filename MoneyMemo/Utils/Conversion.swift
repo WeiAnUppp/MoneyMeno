@@ -52,3 +52,19 @@ func imageToBase64(_ image: UIImage) -> String? {
     guard let data = image.jpegData(compressionQuality: 0.8) else { return nil }
     return data.base64EncodedString()
 }
+
+
+extension Date {
+    func startOfDay() -> Date {
+        Calendar.current.startOfDay(for: self)
+    }
+    
+    func endOfDay() -> Date {
+        Calendar.current.date(
+            bySettingHour: 23,
+            minute: 59,
+            second: 59,
+            of: self
+        ) ?? self
+    }
+}

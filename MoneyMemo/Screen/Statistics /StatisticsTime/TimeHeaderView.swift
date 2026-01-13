@@ -69,6 +69,8 @@ struct TimeHeaderView: View {
                 }
                 
                 Button {
+                    startDate = startDate.startOfDay()
+                    endDate = endDate.endOfDay()
                     showRangePicker = false
                 } label: {
                     Text("完成")

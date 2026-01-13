@@ -14,7 +14,6 @@ struct SaleFilterView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var viewModel: AccountBookViewModel
     
-    // MARK: - State
     // 类型筛选（全部 / 支出 / 收入）
     @State private var selectedType = 0
     
@@ -124,8 +123,8 @@ struct SaleFilterView: View {
                             type: selectedType,
                             categories: Set(selectedCategories.map { $0.name }),
                             useDateRange: useCustomDateRange,
-                            startDate: startDate,
-                            endDate: endDate
+                            startDate: startDate.startOfDay(),
+                            endDate: endDate.endOfDay()
                         )
                         
                         onApply(filter)
