@@ -54,6 +54,8 @@ func imageToBase64(_ image: UIImage) -> String? {
 }
 
 
+
+// MARK: - 结束时间在23:59:59
 extension Date {
     func startOfDay() -> Date {
         Calendar.current.startOfDay(for: self)
