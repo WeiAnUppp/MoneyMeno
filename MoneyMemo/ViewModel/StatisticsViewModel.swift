@@ -72,7 +72,7 @@ class StatisticsViewModel: ObservableObject {
             .reduce(0) { $0 + $1.amount }
     }
     
-    // MARK: - 按分类统计总额（ 修正版）
+    // MARK: - 按分类统计总额
     func categorySummary(
         for type: CategoryType,
         startDate: Date,
