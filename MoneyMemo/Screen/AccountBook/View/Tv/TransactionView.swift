@@ -60,6 +60,7 @@ struct TransactionView: View {
                 
                 // MARK: - 分类
                 Section {
+                    // 折叠
                     DisclosureGroup(isExpanded: $categoryExpanded) {
                         LazyVGrid(
                             columns: Array(repeating: GridItem(.flexible()), count: 3),
