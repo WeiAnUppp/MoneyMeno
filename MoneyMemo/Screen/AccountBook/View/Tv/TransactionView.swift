@@ -232,8 +232,7 @@ struct TransactionView: View {
                         .font(.system(size: 22))
                         .foregroundColor(.white)
                         .frame(width: 56, height: 56)
-                        .background(Color.accentColor)
-                        .clipShape(Circle())
+                        .glassEffect(.regular.tint(.accentColor).interactive(), in: .circle)
                         .shadow(radius: 4)
                 }
                 .padding(.trailing, 20)
