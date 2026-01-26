@@ -427,11 +427,11 @@ struct TransactionView: View {
                 }
             }
             
-            if let title = result.title, titleText.isEmpty {
+            if let title = result.title {
                 titleText = title
             }
             
-            if let remark = result.remark, noteText.isEmpty {
+            if let remark = result.remark {
                 noteText = remark
             }
             

@@ -47,9 +47,43 @@ func currencySymbol(_ newCurrency: String) -> String {
     }
 }
 
-// MARK: - 获取的图片转为base64编码格式
+// MARK: - 将 UIImage 转为 Base64（压缩尺寸 + 降低质量，用于 AI 识别 / 网络传输优化）
 func imageToBase64(_ image: UIImage) -> String? {
-    guard let data = image.jpegData(compressionQuality: 0.8) else { return nil }
+
+    // 最大边长（像素）
+    // 控制图片分辨率，显著减少视觉 token 数量，加快 AI 识别速度
+    let maxSide: CGFloat = 1024
+
+    // 原始图片尺寸
+    let size = image.size
+
+    // 按比例缩放，保证最长边不超过 maxSide，且不放大原图
+    let scale = min(maxSide / size.width, maxSide / size.height, 1)
+
+    // 缩放后的新尺寸
+    let newSize = CGSize(
+        width: size.width * scale,
+        height: size.height * scale
+    )
+
+    // 开始绘制缩放后的图片
+    // opaque = true：不需要透明通道，体积更小
+    // scale = 1.0：使用像素尺寸，避免额外放大
+    UIGraphicsBeginImageContextWithOptions(newSize, true, 1.0)
+    image.draw(in: CGRect(origin: .zero, size: newSize))
+
+    // 获取缩放后的图片
+    let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+    UIGraphicsEndImageContext()
+
+    // JPEG 压缩
+    // compressionQuality: 0.7
+    // 在保证金额、日期、商户名可识别的前提下，进一步降低体积和网络开销
+    guard let finalImage = resizedImage,
+          let data = finalImage.jpegData(compressionQuality: 0.7)
+    else { return nil }
+
+    // 转为 Base64 字符串，用于接口上传
     return data.base64EncodedString()
 }
 
